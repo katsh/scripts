@@ -5,6 +5,17 @@
 # Name it whatever you want and have i3bar use it in ~/.i3/config
 # Uses python2.
 
+
+# It shows you:
+# - date & time
+# - wireless signal strength
+# - volume %
+# - email
+# - if caps lock, num lock or scroll lock is active..because my keyboard has no LEDs =(
+# - how many new gmail messages you have
+# - SSH hosts you are connected to
+
+
 # Note
 # ---------
 # 1. In the email function change it to your gmail's username/password.
@@ -254,7 +265,7 @@ while True:
 	b.volume()			      # volume
 	b.Wireless()		     	# wireless signal
 	b.date()				# date
-	#b.mem()				# memory
+	b.mem()				# memory
 
 	stdout.write(',' + json.dumps(b.final))
 	stdout.flush()
