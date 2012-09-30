@@ -1,7 +1,18 @@
 #!/usr/bin/python2
 # coding: utf-8
 
-#TODO facebook notifications?
+# This is a status bar for the i3wm's i3bar.
+# Name it whatever you want and have i3bar use it in ~/.i3/config
+# Uses python2.
+
+# Note
+# ---------
+# 1. In the email function change it to your gmail's username/password.
+# 2. The volume % uses ALSA. I'm sure it won't be hard to change it to PulseAudio if you need it.
+# 3. SSH part is commented out by default. This is because it's sorta specific. If you want to use it,
+#    you'll need the file ~/.ssh/config, where it needs a host and hostname.
+#    Your open SSH connections will then be shown in the i3bar, by name.
+
 
 import json
 from sys import stdout
@@ -9,13 +20,10 @@ from time import sleep
 from subprocess import check_output as o
 
 
-
-
 # Needed by i3bar
 print '{"version":1}'
 print '['
 print '[]'
-
 
 class Base:
 
@@ -61,6 +69,7 @@ class Base:
 		# 2 - I made it so each box i ssh into, the bash is displayed in a different color.
 		#		By listing connections by colors on i3bar, it helps me identify which ssh session is which
 		#
+                '''
 		self.conns = {}
 		f = open ("/home/lyrae/.ssh/config")
 		h = ''
@@ -75,6 +84,7 @@ class Base:
 				h = ''
 				i = ''
 		f.close()
+                '''
 
 
 
@@ -112,10 +122,13 @@ class Base:
 
 
 	def mail(self):
+		# Thanks to
+		# crunchbanglinux.org/forums/topic/16430/make-conky-check-gmail-using-https/
+		# for easy way to get unread mails.
 		ret = "unread: %s    "
 		cmd = "\
 		wget -q -O - https://mail.google.com/a/gmail.com/feed/atom \
-		--http-user=YOU@gmail.com --http-password=\"SECRET\" \
+		--http-user=MEEE@GMAIL.COM --http-password=\"SECRET!!\" \
 		--no-check-certificate | grep fullcount | sed \"s/<[^0-9]*>//g\""
 		num = o([cmd], shell=True).strip()
 
@@ -202,26 +215,31 @@ class Base:
 		})
 
 
+	'''
 	def ssh(self):
 		w = o("lsof -i tcp -n | grep ssh | cut -d '>' -f 2 | cut -d ':' -f 1", shell=True).strip()
 
 		#print "\n\n\n\n%s\n\n\n\n" % w
 		array = w.split()
 		size = len(array)
-		if len(w) ==  0:
+		if not w:
 			self.final.append({
 				"name" : "ssh",
 				"full_text": "[ no ssh connections ]" + self.spacer,
 				"color": self.color_inactive
 			})
 		else:
-			for i in list(set(array)): # remove duplicates
+			for i in array:
 				spacer = ' ' if i == size else self.spacer
 				self.final.append({
 					"name" : "ssh",
 					"full_text": self.conns[i],
 					"color": self.ssh_colors[self.conns[i]]
 				})
+
+	'''
+
+
 
 b = Base()
 
@@ -230,11 +248,11 @@ b = Base()
 while True:
 
 	# Comment out what you don't want shown
-	b.ssh()				# ssh connections
+	#b.ssh()				# ssh connections
 	b.mail()				# email
 	b.leds()				# caps | numlock | scroll lock leds
-	b.volume()			        # volume
-	b.Wireless()		        # wireless signal
+	b.volume()			      # volume
+	b.Wireless()		     	# wireless signal
 	b.date()				# date
 	#b.mem()				# memory
 
